@@ -1,5 +1,7 @@
 #include<TimerOne.h>
+#include <SoftwareSerial.h>
 #include "pitches.h"
+SoftwareSerial mySerial (9, 10) ;//RX-9, TX-10
 // notes in the melody:
 int melody[] = {
   NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3, NOTE_C4
@@ -11,6 +13,8 @@ int noteDurations[] = {
 };
 #define ledPin 7
 
+String input;
+int i;
 String my_name;
 
 
@@ -37,7 +41,7 @@ void setup (){
 //85%-> 96 (normal) 
 //70%-> 48 (low)
 //77%->63  (normal)
-  
+mySerial . begin (9600) ; 
 Serial.begin(9600) ;
 // For Serial Monitor
 // Configure the PulseSensor object, by assigning our variables to it.
@@ -60,7 +64,8 @@ void loop () {
   while(Serial.available()==0){}
         
         my_name = Serial.readStringUntil('\n');
- 
+         Serial.println();
+         Serial.println();
         Serial.println("Nice to meet you, " + my_name + "!");
    
 int myBPM = pulseSensor.getBeatsPerMinute();
@@ -71,26 +76,69 @@ Serial.println ("A HeartBeat Happened ! ");
 Serial.print("BPM: ");
 Serial.println (myBPM);
 if( myBPM < 60){
+  Serial.println();
+  
   Serial.println(my_name+", Your Heart Rate is Low and you are suffering from BRADYCARDIA");
   analogWrite(ledPin,255);
   int noteDuration = 2000;
     tone(6, melody[0], noteDuration);
+    mySerial.println();
+    mySerial.println();
+  
+     mySerial.println("AT+CMGF=1");
+   delay(1000);
+    mySerial.println("OK");
+   delay(1000);
+   mySerial.println("AT+CMGS=\"+8801757403666\"\r"); // leplace s with Mobile mader
+   delay(1000);
+    mySerial.print(my_name+"'s heart Rate is Low and suffering from BRADYCARDIA\n");
+    mySerial.println();
+    mySerial.println();
+    mySerial.println("---------------------------------------------------------------------");
     //int pauseBetweenNotes = noteDuration * 1.30;
     //delay(pauseBetweenNotes);
     //tone(6, 0, noteDuration);
 }
 else if( myBPM > 100){
+  Serial.println();
+  Serial.println();
   Serial.println(my_name+", Your Heart Rate is High and you are suffering from TACHYCARDIA");
   analogWrite(ledPin,255);
    noteDuration = 2000;
     tone(6, melody[0], noteDuration);
+     mySerial.println();
+     
+     mySerial.println("AT+CMGF=1");
+   delay(1000);
+    mySerial.println("OK");
+   delay(1000);
+   mySerial.println("AT+CMGS=\"+8801757403666\"\r"); // leplace s with Mobile mader
+   delay(1000);
+     mySerial.println(my_name+"'s Heart Rate is High and suffering from TACHYCARDIA");
+     mySerial.println();
+     mySerial.println();
+     mySerial.println("----------------------------------------------------------------------");
     //int pauseBetweenNotes = noteDuration * 1.30;
     //delay(pauseBetweenNotes);
     //tone(6, 0, noteDuration);
 }
 else{
+  Serial.println();
   Serial.println(my_name+", Your Heart rate is normal");
   analogWrite(ledPin,0);
+  mySerial.println();
+  mySerial.println();
+  
+   mySerial.println("AT+CMGF=1");
+   delay(1000);
+   mySerial.println("OK");
+   delay(1000);
+   mySerial.println("AT+CMGS=\"+8801757403666\"\r"); // leplace s with Mobile mader
+   delay(1000);
+  mySerial.println(my_name+"'s Heart rate is normal");
+  mySerial.println();
+  mySerial.println();
+  mySerial.println("---------------------------------------------------------------------------");
 }
 }
 //tone(6, 0, noteDuration);
